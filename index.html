@@ -3,15 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (靜態圖片 - 篩選修正)</title>
+    <title>👗 動態時尚圖片畫廊 (含更新按鈕)</title>
     <style>
-        /* --- CSS 樣式保持不變 --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
-        h1 { text-align: center; color: #333; margin-bottom: 20px; }
-        .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
-        .filter-group { display: flex; flex-direction: column; }
-        .filter-group label { font-weight: bold; color: #555; margin-bottom: 5px; }
-        .filter-group select { padding: 10px 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; cursor: pointer; min-width: 150px; }
+        /* --- CSS 基礎樣式與佈局 --- */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f4f9; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        .filter-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            align-items: flex-end; /* 將內容底部對齊 */
+            gap: 20px; 
+            padding: 15px; 
+            background-color: #fff; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            margin-bottom: 30px; 
+        }
+        .filter-group { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .filter-group label { 
+            font-weight: bold; 
+            color: #555; 
+            margin-bottom: 5px; 
+        }
+        .filter-group select { 
+            padding: 10px 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            background-color: #f9f9f9; 
+            cursor: pointer; 
+            min-width: 150px; 
+            height: 40px; /* 統一高度 */
+        }
+        /* 更新按鈕樣式 */
+        #update-button {
+            padding: 10px 20px;
+            height: 40px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #update-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 圖片畫廊樣式 (保持不變) */
         .gallery-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .gallery-item { overflow: hidden; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: #fff; transition: transform 0.3s ease; cursor: pointer; }
         .gallery-item:hover { transform: translateY(-5px); }
@@ -26,12 +78,12 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (靜態圖片 - 篩選修正)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (含更新按鈕)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
             <label for="style-select">風格 (Style):</label>
-            <select id="style-select" onchange="updateGallery()">
+            <select id="style-select">
                 <option value="streetwear" selected>街頭穿搭 Streetwear</option>
                 <option value="formal">正裝 Formal</option>
                 <option value="fashion">時尚 Fashion</option>
@@ -41,7 +93,7 @@
         </div>
         <div class="filter-group">
             <label for="subject-select">主題/人物 (Subject):</label>
-            <select id="subject-select" onchange="updateGallery()">
+            <select id="subject-select">
                 <option value="model,female" selected>女生服飾 Female Model</option>
                 <option value="model,male">男生服飾 Male Model</option>
                 <option value="model">不限性別 Model</option>
@@ -50,11 +102,15 @@
         </div>
         <div class="filter-group">
             <label for="orientation-select">方向 (Orientation):</label>
-            <select id="orientation-select" onchange="updateGallery()">
+            <select id="orientation-select">
                 <option value="portrait" selected>垂直/人像 Vertical (Portrait)</option>
                 <option value="landscape">水平/風景 Horizontal (Landscape)</option>
                 <option value="">自動 Auto</option>
             </select>
+        </div>
+        
+        <div class="filter-group">
+            <button id="update-button" onclick="updateGallery()">更新圖片</button>
         </div>
     </div>
 
@@ -70,9 +126,7 @@
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
         
-        // ⭐ 核心變動：定義多組靜態圖片 URL 陣列
-        
-        // 1. 預設或街頭穿搭 (Streetwear) 圖片組
+        // 1. 街頭穿搭 (Streetwear) 圖片組
         const FASHION_IMAGES_STREETWEAR = [
             'https://images.pexels.com/photos/1036620/pexels-photo-1036620.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
             'https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
@@ -124,8 +178,9 @@
             modal.style.display = "none";
         }
 
-        // --- 畫廊更新函數 (核心修正) ---
+        // --- 畫廊更新函數 (核心) ---
         function updateGallery() {
+            // ⭐ 獲取三個選項的值
             const selectedStyle = document.getElementById('style-select').value;
             const selectedSubject = document.getElementById('subject-select').value;
             const selectedOrientation = document.getElementById('orientation-select').value;
@@ -138,15 +193,13 @@
             } else if (selectedStyle === 'streetwear') {
                 imagesToUse = FASHION_IMAGES_STREETWEAR;
             } 
-            // 如果你需要支援其他選項（如 vintage），你需要為它們定義額外的陣列。
-
+            // 注意：其他風格選項沒有對應的陣列，將使用 Streetwear 陣列。
 
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
             // 遍歷選定的圖片陣列
             for (let i = 0; i < imagesToUse.length; i++) {
-                // 圖片來源直接來自選定的靜態陣列
                 let imageUrl = imagesToUse[i]; 
                 
                 const item = document.createElement('div');
@@ -165,11 +218,10 @@
                 gallery.appendChild(item);
             }
             
-            // 由於我們無法在靜態陣列中實現方向篩選，我們可以輸出提示到控制台
-            console.log(`篩選成功：當前風格為 ${selectedStyle}。`);
-            console.log(`方向和人物篩選在靜態模式下僅供展示，圖片不會改變。`);
+            console.log(`圖片更新完成。當前選擇：風格(${selectedStyle}), 人物(${selectedSubject}), 方向(${selectedOrientation})`);
         }
         
+        // 頁面載入完成後，自動執行一次以載入初始圖片
         window.onload = updateGallery; 
     </script>
 
