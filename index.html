@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (Unsplash 穩定版)</title>
+    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (最終穩定版)</title>
     <style>
         /* CSS 樣式與之前相同 (省略重複內容) */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (時尚主題)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (最終穩定版)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -70,8 +70,8 @@
     <script>
         // 抓取圖片的數量
         const IMAGE_COUNT = 15;
-        // ⭐ 關鍵變更：改回 Unsplash，使用更穩定的 /800x900/? 格式
-        const UNSPLASH_BASE_URL = 'https://unsplash.com/';
+        // ⭐ 最終修正：使用專門的圖片 API 子網域 source.unsplash.com/
+        const UNSPLASH_BASE_URL = 'https://source.unsplash.com/';
         // 圖片解析度：畫廊顯示時使用的尺寸 (較小)
         const RESOLUTION = '800x900'; 
         // 圖片解析度：放大顯示時使用的尺寸 (較大)
@@ -99,18 +99,18 @@
             const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
 
-            // 組合查詢關鍵字
-            // 新增一個 'fashion' 或 'clothing' 作為強關鍵字，確保主題正確
-            const keywords = [style, subject, 'clothing', 'fashion'].filter(Boolean).join(',');
+            // 組合查詢關鍵字 (使用問號 ? 參數格式)
+            const keywords = [style, subject].filter(Boolean).join(',');
 
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
             for (let i = 0; i < IMAGE_COUNT; i++) {
-                // 連結格式: https://unsplash.com/[RESOLUTION]/?query=[KEYWORDS]&orientation=[ORIENTATION]&sig=[SIG]
-                // 這裡我們使用 query= 來傳遞關鍵字，這比 /random/ 更穩定。
-                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?query=${keywords}&orientation=${orientation}&sig=${i}`;
-                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?query=${keywords}&orientation=${orientation}&sig=${i}`;
+                // 連結格式: https://source.unsplash.com/[RESOLUTION]/?keywords,keywords&orientation=[ORIENTATION]&sig=[SIG]
+                // 這是最接近你一開始的設想，且應該是 Unsplash 支援的最佳外部圖片連結。
+                
+                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
+                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
@@ -119,7 +119,7 @@
                 img.src = thumbUrl; 
                 img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
 
-                // 圖片載入錯誤處理 (保留，以防新的連結再次被阻擋)
+                // 圖片載入錯誤處理 (保留)
                 img.onerror = function() {
                     console.error(`圖片載入失敗: ${thumbUrl}`);
                     img.style.backgroundColor = '#ccc';
