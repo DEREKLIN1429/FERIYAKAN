@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (含更新按鈕)</title>
+    <title>👗 動態時尚圖片畫廊 (文字搜尋版)</title>
     <style>
         /* --- CSS 基礎樣式與佈局 --- */
         body { 
@@ -38,20 +38,20 @@
             color: #555; 
             margin-bottom: 5px; 
         }
-        .filter-group select { 
+        .filter-group input[type="text"] { /* 樣式化輸入框 */
             padding: 10px 15px; 
             border: 1px solid #ccc; 
             border-radius: 5px; 
             background-color: #f9f9f9; 
-            cursor: pointer; 
-            min-width: 150px; 
-            height: 40px; /* 統一高度 */
+            min-width: 200px; 
+            height: 40px;
+            box-sizing: border-box;
         }
-        /* 更新按鈕樣式 */
-        #update-button {
+        /* 搜尋按鈕樣式 */
+        #search-button {
             padding: 10px 20px;
             height: 40px;
-            background-color: #007bff;
+            background-color: #28a745; /* 綠色按鈕 */
             color: white;
             border: none;
             border-radius: 5px;
@@ -59,8 +59,8 @@
             font-weight: bold;
             transition: background-color 0.3s;
         }
-        #update-button:hover {
-            background-color: #0056b3;
+        #search-button:hover {
+            background-color: #1e7e34;
         }
 
         /* 圖片畫廊樣式 (保持不變) */
@@ -78,39 +78,16 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (含更新按鈕)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (文字搜尋版)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
-            <label for="style-select">風格 (Style):</label>
-            <select id="style-select">
-                <option value="streetwear" selected>街頭穿搭 Streetwear</option>
-                <option value="formal">正裝 Formal</option>
-                <option value="fashion">時尚 Fashion</option>
-                <option value="vintage">復古風 Vintage</option>
-                <option value="sportswear">運動風 Sportswear</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="subject-select">主題/人物 (Subject):</label>
-            <select id="subject-select">
-                <option value="model,female" selected>女生服飾 Female Model</option>
-                <option value="model,male">男生服飾 Male Model</option>
-                <option value="model">不限性別 Model</option>
-                <option value="clothing">純服飾 Clothing Only</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="orientation-select">方向 (Orientation):</label>
-            <select id="orientation-select">
-                <option value="portrait" selected>垂直/人像 Vertical (Portrait)</option>
-                <option value="landscape">水平/風景 Horizontal (Landscape)</option>
-                <option value="">自動 Auto</option>
-            </select>
+            <label for="style-input">輸入風格關鍵字:</label>
+            <input type="text" id="style-input" placeholder="例如: streetwear, vintage, formal">
         </div>
         
         <div class="filter-group">
-            <button id="update-button" onclick="updateGallery()">更新圖片</button>
+            <button id="search-button" onclick="updateGallery()">搜尋圖片</button>
         </div>
     </div>
 
@@ -125,50 +102,19 @@
     <script>
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
+        // 重新使用 Unsplash (目標是能搜尋主題)
+        const UNSPLASH_BASE_URL = 'https://source.unsplash.com/';
+        const RESOLUTION = '800x900'; 
+        const LARGE_RESOLUTION = '1600x1800'; 
         
-        // 1. 街頭穿搭 (Streetwear) 圖片組
-        const FASHION_IMAGES_STREETWEAR = [
-            'https://images.pexels.com/photos/1036620/pexels-photo-1036620.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/1484807/pexels-photo-1484807.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/994234/pexels-photo-994234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/3310695/pexels-photo-3310695.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/3757753/pexels-photo-3757753.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/2036622/pexels-photo-2036622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/157675/fashion-men-s-accessories-road-tie-157675.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/1083842/pexels-photo-1083842.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/3769185/pexels-photo-3769185.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/1586762/pexels-photo-1586762.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/45988/pexels-photo-45988.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-        ];
-        
-        // 2. 正裝 (Formal) 圖片組
-        const FASHION_IMAGES_FORMAL = [
-            'https://images.pexels.com/photos/2101503/pexels-photo-2101503.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/459793/pexels-photo-459793.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/3769747/pexels-photo-3769747.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/279803/pexels-photo-279803.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/4522856/pexels-photo-4522856.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/1571470/pexels-photo-1571470.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/2085732/pexels-photo-2085732.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-            'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/157675/fashion-men-s-accessories-road-tie-157675.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/1083842/pexels-photo-1083842.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/1586762/pexels-photo-1586762.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/2036622/pexels-photo-2036622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/45988/pexels-photo-45988.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-            'https://images.pexels.com/photos/3757753/pexels-photo-3757753.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-        ];
-
+        // Picsum 後備 (如果 Unsplash 被阻擋)
+        const FALLBACK_IMAGE_THUMB = 'https://picsum.photos/800/900'; 
+        const FALLBACK_IMAGE_LARGE = 'https://picsum.photos/1600/1800'; 
 
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
-        // --- 模態視窗函數 (不變) ---
+        // --- 模態視窗函數 ---
         function openModal(src) {
             modal.style.display = "block";
             modalImg.src = src;
@@ -180,48 +126,64 @@
 
         // --- 畫廊更新函數 (核心) ---
         function updateGallery() {
-            // ⭐ 獲取三個選項的值
-            const selectedStyle = document.getElementById('style-select').value;
-            const selectedSubject = document.getElementById('subject-select').value;
-            const selectedOrientation = document.getElementById('orientation-select').value;
+            // ⭐ 獲取使用者輸入的風格關鍵字
+            let userKeywords = document.getElementById('style-input').value.trim();
             
-            // ⭐ 根據選擇的風格，選擇要使用的圖片陣列
-            let imagesToUse = FASHION_IMAGES_STREETWEAR; // 預設使用 Streetwear
-
-            if (selectedStyle === 'formal') {
-                imagesToUse = FASHION_IMAGES_FORMAL;
-            } else if (selectedStyle === 'streetwear') {
-                imagesToUse = FASHION_IMAGES_STREETWEAR;
-            } 
-            // 注意：其他風格選項沒有對應的陣列，將使用 Streetwear 陣列。
-
+            // 預設關鍵字，確保至少有 "fashion" 和 "model"
+            if (userKeywords === "") {
+                userKeywords = "fashion, model";
+            } else {
+                // 將使用者輸入與 "model" 和 "clothing" 組合，增加主題準確性
+                userKeywords = userKeywords + ", model, clothing";
+            }
+            
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
+            
+            // 加入防快取參數
+            const timestamp = new Date().getTime();
 
-            // 遍歷選定的圖片陣列
-            for (let i = 0; i < imagesToUse.length; i++) {
-                let imageUrl = imagesToUse[i]; 
+            for (let i = 0; i < IMAGE_COUNT; i++) {
+                // 使用者輸入的 Unsplash 連結
+                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${userKeywords}&t=${timestamp}&i=${i}`;
+                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${userKeywords}&t=${timestamp}&i=${i}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
-                img.src = imageUrl; 
-                img.alt = `風格: ${selectedStyle}, 人物: ${selectedSubject}`; 
-                
-                // 綁定點擊事件 (放大圖使用原圖連結)
+                img.src = thumbUrl; 
+                img.alt = `風格關鍵字: ${userKeywords}`;
+
+                // ⭐ 圖片載入錯誤處理：如果 Unsplash 失敗，切換到 Picsum 後備
+                img.onerror = function() {
+                    console.error(`Unsplash圖片載入失敗，切換到 Picsum 後備。`);
+                    // 如果 Unsplash 失敗，我們改用 Picsum，並使用 i 作為 seed 確保圖片不同
+                    const picsumThumb = `https://picsum.photos/seed/${i}/800/900`;
+                    const picsumLarge = `https://picsum.photos/seed/${i}/1600/1800`;
+                    
+                    img.src = picsumThumb; 
+                    img.alt = '圖片載入失敗 (切換至 Picsum)';
+                    
+                    // 確保點擊後備圖時，放大也是後備圖
+                    item.onclick = function() {
+                        openModal(picsumLarge);
+                    };
+                };
+
+                // 綁定點擊事件 (預設是 Unsplash 大圖)
                 item.onclick = function() {
-                    openModal(imageUrl);
+                    openModal(largeUrl);
                 };
                 
                 item.appendChild(img);
                 gallery.appendChild(item);
             }
             
-            console.log(`圖片更新完成。當前選擇：風格(${selectedStyle}), 人物(${selectedSubject}), 方向(${selectedOrientation})`);
+            console.log(`正在嘗試使用 Unsplash 搜尋關鍵字: ${userKeywords}`);
         }
         
-        // 頁面載入完成後，自動執行一次以載入初始圖片
+        // 頁面載入時，載入預設圖片
         window.onload = updateGallery; 
     </script>
 
