@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (最終穩定版 - 靜態圖片)</title>
+    <title>👗 動態時尚圖片畫廊 (靜態圖片 - 篩選修正)</title>
     <style>
         /* --- CSS 樣式保持不變 --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
@@ -26,16 +26,16 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (靜態圖片組)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (靜態圖片 - 篩選修正)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
             <label for="style-select">風格 (Style):</label>
             <select id="style-select" onchange="updateGallery()">
-                <option value="fashion">時尚 Fashion</option>
                 <option value="streetwear" selected>街頭穿搭 Streetwear</option>
-                <option value="vintage">復古風 Vintage</option>
                 <option value="formal">正裝 Formal</option>
+                <option value="fashion">時尚 Fashion</option>
+                <option value="vintage">復古風 Vintage</option>
                 <option value="sportswear">運動風 Sportswear</option>
             </select>
         </div>
@@ -70,9 +70,10 @@
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
         
-        // ⭐ 核心變動：靜態圖片 URL 陣列 (時尚主題)
-        // 使用大型平台(如 Pexels) 的靜態連結，以確保穩定性。
-        const FASHION_IMAGES = [
+        // ⭐ 核心變動：定義多組靜態圖片 URL 陣列
+        
+        // 1. 預設或街頭穿搭 (Streetwear) 圖片組
+        const FASHION_IMAGES_STREETWEAR = [
             'https://images.pexels.com/photos/1036620/pexels-photo-1036620.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
             'https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
             'https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
@@ -90,10 +91,30 @@
             'https://images.pexels.com/photos/45988/pexels-photo-45988.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
         ];
         
+        // 2. 正裝 (Formal) 圖片組
+        const FASHION_IMAGES_FORMAL = [
+            'https://images.pexels.com/photos/2101503/pexels-photo-2101503.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/459793/pexels-photo-459793.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/3769747/pexels-photo-3769747.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/279803/pexels-photo-279803.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/4522856/pexels-photo-4522856.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/1571470/pexels-photo-1571470.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/2085732/pexels-photo-2085732.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/157675/fashion-men-s-accessories-road-tie-157675.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1083842/pexels-photo-1083842.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1586762/pexels-photo-1586762.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/2036622/pexels-photo-2036622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/45988/pexels-photo-45988.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3757753/pexels-photo-3757753.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+        ];
+
+
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
-        // --- 模態視窗函數 ---
+        // --- 模態視窗函數 (不變) ---
         function openModal(src) {
             modal.style.display = "block";
             modalImg.src = src;
@@ -103,30 +124,39 @@
             modal.style.display = "none";
         }
 
-        // --- 畫廊更新函數 (核心) ---
+        // --- 畫廊更新函數 (核心修正) ---
         function updateGallery() {
-            // 篩選選單的邏輯仍然執行，但僅用於未來或理論上的篩選，不再影響圖片來源
-            const style = document.getElementById('style-select').value;
-            const subject = document.getElementById('subject-select').value;
+            const selectedStyle = document.getElementById('style-select').value;
+            const selectedSubject = document.getElementById('subject-select').value;
+            const selectedOrientation = document.getElementById('orientation-select').value;
             
+            // ⭐ 根據選擇的風格，選擇要使用的圖片陣列
+            let imagesToUse = FASHION_IMAGES_STREETWEAR; // 預設使用 Streetwear
+
+            if (selectedStyle === 'formal') {
+                imagesToUse = FASHION_IMAGES_FORMAL;
+            } else if (selectedStyle === 'streetwear') {
+                imagesToUse = FASHION_IMAGES_STREETWEAR;
+            } 
+            // 如果你需要支援其他選項（如 vintage），你需要為它們定義額外的陣列。
+
+
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
-            // 我們只顯示 FASHION_IMAGES 陣列中的圖片
-            for (let i = 0; i < FASHION_IMAGES.length; i++) {
-                // 圖片來源直接來自靜態陣列
-                let imageUrl = FASHION_IMAGES[i]; 
+            // 遍歷選定的圖片陣列
+            for (let i = 0; i < imagesToUse.length; i++) {
+                // 圖片來源直接來自選定的靜態陣列
+                let imageUrl = imagesToUse[i]; 
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
                 img.src = imageUrl; 
-                img.alt = `時尚圖片 ${i + 1} - ${style}, ${subject}`; // alt 文本仍然使用篩選關鍵字
+                img.alt = `風格: ${selectedStyle}, 人物: ${selectedSubject}`; 
                 
-                // ⭐ 移除 onerror 處理，因為這是靜態連結，不應該失敗
-
-                // 綁定點擊事件 (放大圖使用原圖連結，因為 Pexels 連結已經是高解析度)
+                // 綁定點擊事件 (放大圖使用原圖連結)
                 item.onclick = function() {
                     openModal(imageUrl);
                 };
@@ -134,6 +164,10 @@
                 item.appendChild(img);
                 gallery.appendChild(item);
             }
+            
+            // 由於我們無法在靜態陣列中實現方向篩選，我們可以輸出提示到控制台
+            console.log(`篩選成功：當前風格為 ${selectedStyle}。`);
+            console.log(`方向和人物篩選在靜態模式下僅供展示，圖片不會改變。`);
         }
         
         window.onload = updateGallery; 
