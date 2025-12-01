@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (最終穩定版)</title>
+    <title>👗 動態時尚圖片畫廊 (最終穩定版 - 含後備)</title>
     <style>
         /* CSS 樣式與之前相同 (省略重複內容) */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (最終穩定版)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (含後備圖片)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -70,45 +70,41 @@
     <script>
         // 抓取圖片的數量
         const IMAGE_COUNT = 15;
-        // ⭐ 最終修正：使用專門的圖片 API 子網域 source.unsplash.com/
         const UNSPLASH_BASE_URL = 'https://source.unsplash.com/';
-        // 圖片解析度：畫廊顯示時使用的尺寸 (較小)
         const RESOLUTION = '800x900'; 
-        // 圖片解析度：放大顯示時使用的尺寸 (較大)
         const LARGE_RESOLUTION = '1600x1800'; 
+        
+        // ⭐ 新增：本地後備圖片路徑
+        // 假設你的 HTML 文件所在資料夾有一個名為 placeholder.jpg 的圖片
+        const FALLBACK_IMAGE_PATH = 'placeholder.jpg'; 
 
-        // 取得模態視窗的 DOM 元素
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
         function openModal(src) {
             modal.style.display = "block";
-            modalImg.src = src;
+            // 💡 如果是後備圖片，放大圖也使用後備圖片
+            if (src === FALLBACK_IMAGE_PATH) {
+                modalImg.src = FALLBACK_IMAGE_PATH;
+            } else {
+                modalImg.src = src;
+            }
         }
 
         function closeModal() {
             modal.style.display = "none";
         }
 
-        /**
-         * @function updateGallery
-         * @description 根據下拉選單的值，動態生成查詢字串並更新圖片畫廊。
-         */
         function updateGallery() {
             const style = document.getElementById('style-select').value;
             const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
 
-            // 組合查詢關鍵字 (使用問號 ? 參數格式)
             const keywords = [style, subject].filter(Boolean).join(',');
-
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
             for (let i = 0; i < IMAGE_COUNT; i++) {
-                // 連結格式: https://source.unsplash.com/[RESOLUTION]/?keywords,keywords&orientation=[ORIENTATION]&sig=[SIG]
-                // 這是最接近你一開始的設想，且應該是 Unsplash 支援的最佳外部圖片連結。
-                
                 let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
                 let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
                 
@@ -119,15 +115,17 @@
                 img.src = thumbUrl; 
                 img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
 
-                // 圖片載入錯誤處理 (保留)
+                // ⭐ 關鍵修正：圖片載入錯誤處理，切換到本地後備圖片
                 img.onerror = function() {
-                    console.error(`圖片載入失敗: ${thumbUrl}`);
-                    img.style.backgroundColor = '#ccc';
-                    img.alt = '圖片載入失敗 (Image Load Failed)';
+                    console.error(`Unsplash圖片載入失敗，切換到後備圖片: ${thumbUrl}`);
+                    img.src = FALLBACK_IMAGE_PATH;
+                    img.alt = '圖片載入失敗 (切換至後備)';
                 };
 
+                // 綁定點擊事件。如果圖片已經是後備圖，largeUrl 也使用後備圖的路徑。
                 item.onclick = function() {
-                    openModal(largeUrl);
+                    const finalLargeUrl = img.src === thumbUrl ? largeUrl : FALLBACK_IMAGE_PATH;
+                    openModal(finalLargeUrl);
                 };
                 
                 item.appendChild(img);
@@ -136,7 +134,6 @@
         }
         
         window.onload = updateGallery; 
-
     </script>
 
 </body>
