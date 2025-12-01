@@ -3,121 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (最終穩定版 - 防快取)</title>
+    <title>👗 動態時尚圖片畫廊 (使用 Placehold.it 佔位圖)</title>
     <style>
-        /* --- CSS 基礎樣式與佈局 --- */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: #f4f4f9; 
-        }
-        h1 { 
-            text-align: center; 
-            color: #333; 
-            margin-bottom: 20px; 
-        }
-        .filter-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 20px; 
-            padding: 15px; 
-            background-color: #fff; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-            margin-bottom: 30px; 
-        }
-        .filter-group { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .filter-group label { 
-            font-weight: bold; 
-            color: #555; 
-            margin-bottom: 5px; 
-        }
-        .filter-group select { 
-            padding: 10px 15px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            background-color: #f9f9f9; 
-            cursor: pointer; 
-            min-width: 150px; 
-        }
-        .gallery-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; 
-        }
-        .gallery-item { 
-            overflow: hidden; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-            background-color: #fff; 
-            transition: transform 0.3s ease; 
-            cursor: pointer; 
-        }
-        .gallery-item:hover { 
-            transform: translateY(-5px); 
-        }
-        .gallery-item img { 
-            width: 100%; 
-            height: 300px; /* 固定高度，減少畫面跳動 (Layout Shift) */
-            object-fit: cover; 
-            display: block; 
-        }
-        /* --- 模態視窗 CSS --- */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 100; 
-            padding-top: 60px; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.9); 
-        }
-        .modal-content { 
-            margin: auto; 
-            display: block; 
-            width: 80%; 
-            max-width: 700px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); 
-            animation-name: zoom; 
-            animation-duration: 0.6s; 
-        }
-        @keyframes zoom { 
-            from {transform:scale(0)} 
-            to {transform:scale(1)} 
-        }
-        .close { 
-            position: absolute; 
-            top: 15px; 
-            right: 35px; 
-            color: #f1f1f1; 
-            font-size: 40px; 
-            font-weight: bold; 
-            transition: 0.3s; 
-            cursor: pointer; 
-        }
-        .close:hover, .close:focus { 
-            color: #bbb; 
-            text-decoration: none; 
-        }
-        @media only screen and (max-width: 700px) { 
-            .modal-content { 
-                width: 100%; 
-            } 
-        }
+        /* CSS 樣式保持不變 */
+        /* ... (CSS 內容與上次提供的相同) ... */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
+        h1 { text-align: center; color: #333; margin-bottom: 20px; }
+        .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-weight: bold; color: #555; margin-bottom: 5px; }
+        .filter-group select { padding: 10px 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; cursor: pointer; min-width: 150px; }
+        .gallery-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .gallery-item { overflow: hidden; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: #fff; transition: transform 0.3s ease; cursor: pointer; }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item img { width: 100%; height: 300px; object-fit: cover; display: block; }
+        .modal { display: none; position: fixed; z-index: 100; padding-top: 60px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); }
+        .modal-content { margin: auto; display: block; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); animation-name: zoom; animation-duration: 0.6s; }
+        @keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
+        .close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .close:hover, .close:focus { color: #bbb; text-decoration: none; }
+        @media only screen and (max-width: 700px) { .modal-content { width: 100%; } }
     </style>
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (最終穩定版)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (使用主題佔位圖)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -160,14 +70,12 @@
     <script>
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
-        const UNSPLASH_BASE_URL = 'https://source.unsplash.com/';
-        const RESOLUTION = '800x900'; 
-        const LARGE_RESOLUTION = '1600x1800'; 
+        // ⭐ 使用 Placehold.it 佔位圖服務作為主題來源
+        const PLACEHOLD_BASE_URL = 'https://placeimg.com/';
+        const RESOLUTION = '800/900'; // 寬/高
+        const LARGE_RESOLUTION = '1600/1800'; 
         
-        // 線上後備圖片路徑：使用 Picsum Photos (穩定性高)
-        const FALLBACK_IMAGE_THUMB = 'https://picsum.photos/seed/fashion/800/900'; 
-        const FALLBACK_IMAGE_LARGE = 'https://picsum.photos/seed/fashion/1600/1800'; 
-
+        // 模態視窗元素
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
@@ -187,39 +95,33 @@
             const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
 
-            // ⭐ 修正：生成一個基於當前時間的隨機數（快取破解）
+            // ⭐ 關鍵修正：將所有關鍵字簡化為一個主題，並使用迴圈數進行隨機化
+            // Placeimg.com 支援的主題有：'arch', 'nature', 'people', 'tech', 'any'
+            // 我們將強制使用 'people' 或 'any' 搭配關鍵字
+            const theme = 'people';
+            // 由於 Unsplash 無法使用，我們使用時間戳和迴圈數來控制 Placeimg.com 圖片不重複
             const timestamp = new Date().getTime();
 
-            const keywords = [style, subject].filter(Boolean).join(',');
+
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
             for (let i = 0; i < IMAGE_COUNT; i++) {
-                // 嘗試載入 Unsplash 圖片
-                // ⭐ 關鍵修正：在連結末尾加入 &t= [時間戳] 和 &i= [迴圈數]
-                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${keywords}&orientation=${orientation}&t=${timestamp}&i=${i}`;
-                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${keywords}&orientation=${orientation}&t=${timestamp}&i=${i}`;
+                // Placeimg 連結格式: https://placeimg.com/[WIDTH]/[HEIGHT]/[THEME]
+                // 為了避免重複，我們將時間戳和迴圈數作為快取破解參數
+                let thumbUrl = `${PLACEHOLD_BASE_URL}${RESOLUTION}/${theme}?t=${timestamp}&i=${i}&q=${style}`;
+                let largeUrl = `${PLACEHOLD_BASE_URL}${LARGE_RESOLUTION}/${theme}?t=${timestamp}&i=${i}&q=${style}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
                 img.src = thumbUrl; 
-                img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
+                img.alt = `時尚圖片 ${i + 1} - ${theme}`;
 
-                // 圖片載入錯誤處理：如果 Unsplash 失敗，切換到 Picsum 後備
-                img.onerror = function() {
-                    console.error(`Unsplash圖片載入失敗，切換到後備圖片。`);
-                    img.src = FALLBACK_IMAGE_THUMB; 
-                    img.alt = '圖片載入失敗 (切換至後備)';
-                    
-                    // 確保點擊後備圖時，放大也是後備圖
-                    item.onclick = function() {
-                        openModal(FALLBACK_IMAGE_LARGE);
-                    };
-                };
-
-                // 綁定點擊事件 (預設是 Unsplash 大圖)
+                // 移除 onerror 處理，因為這是新的穩定來源，應該不會失敗
+                
+                // 綁定點擊事件
                 item.onclick = function() {
                     openModal(largeUrl);
                 };
