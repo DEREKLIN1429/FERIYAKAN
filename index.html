@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (文字搜尋版)</title>
+    <title>👗 動態時尚圖片畫廊 (最終模擬搜尋版)</title>
     <style>
-        /* --- CSS 基礎樣式與佈局 --- */
+        /* CSS 樣式與之前版本相同 */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             margin: 0; 
@@ -21,7 +21,7 @@
             display: flex; 
             flex-wrap: wrap; 
             justify-content: center; 
-            align-items: flex-end; /* 將內容底部對齊 */
+            align-items: flex-end; 
             gap: 20px; 
             padding: 15px; 
             background-color: #fff; 
@@ -38,7 +38,7 @@
             color: #555; 
             margin-bottom: 5px; 
         }
-        .filter-group input[type="text"] { /* 樣式化輸入框 */
+        .filter-group input[type="text"] { 
             padding: 10px 15px; 
             border: 1px solid #ccc; 
             border-radius: 5px; 
@@ -47,11 +47,10 @@
             height: 40px;
             box-sizing: border-box;
         }
-        /* 搜尋按鈕樣式 */
         #search-button {
             padding: 10px 20px;
             height: 40px;
-            background-color: #28a745; /* 綠色按鈕 */
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
@@ -63,7 +62,6 @@
             background-color: #1e7e34;
         }
 
-        /* 圖片畫廊樣式 (保持不變) */
         .gallery-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .gallery-item { overflow: hidden; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: #fff; transition: transform 0.3s ease; cursor: pointer; }
         .gallery-item:hover { transform: translateY(-5px); }
@@ -78,12 +76,12 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (文字搜尋版)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (最終模擬搜尋版)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
             <label for="style-input">輸入風格關鍵字:</label>
-            <input type="text" id="style-input" placeholder="例如: streetwear, vintage, formal">
+            <input type="text" id="style-input" placeholder="例如: red, vintage, suit">
         </div>
         
         <div class="filter-group">
@@ -102,19 +100,15 @@
     <script>
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
-        // 重新使用 Unsplash (目標是能搜尋主題)
-        const UNSPLASH_BASE_URL = 'https://source.unsplash.com/';
-        const RESOLUTION = '800x900'; 
-        const LARGE_RESOLUTION = '1600x1800'; 
+        // 使用 Picsum 服務 (穩定，但只有風景圖)
+        const PICSUM_BASE_URL = 'https://picsum.photos/';
+        const RESOLUTION = '800/900'; 
+        const LARGE_RESOLUTION = '1600/1800'; 
         
-        // Picsum 後備 (如果 Unsplash 被阻擋)
-        const FALLBACK_IMAGE_THUMB = 'https://picsum.photos/800/900'; 
-        const FALLBACK_IMAGE_LARGE = 'https://picsum.photos/1600/1800'; 
-
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
-        // --- 模態視窗函數 ---
+        // --- 模態視窗函數 (不變) ---
         function openModal(src) {
             modal.style.display = "block";
             modalImg.src = src;
@@ -124,54 +118,57 @@
             modal.style.display = "none";
         }
 
+        /**
+         * 簡易哈希函數，將字串轉為數字，用於隨機種子
+         * @param {string} str - 輸入的文字
+         * @returns {number} - 數字種子
+         */
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                hash = hash & hash; // 轉為 32 位整數
+            }
+            return Math.abs(hash);
+        }
+
+
         // --- 畫廊更新函數 (核心) ---
         function updateGallery() {
             // ⭐ 獲取使用者輸入的風格關鍵字
             let userKeywords = document.getElementById('style-input').value.trim();
             
-            // 預設關鍵字，確保至少有 "fashion" 和 "model"
-            if (userKeywords === "") {
-                userKeywords = "fashion, model";
-            } else {
-                // 將使用者輸入與 "model" 和 "clothing" 組合，增加主題準確性
-                userKeywords = userKeywords + ", model, clothing";
+            // 預設種子 (如果輸入為空)
+            let baseSeed = 100;
+            
+            // ⭐ 核心模擬邏輯：將關鍵字轉為一個數字種子
+            if (userKeywords !== "") {
+                // 使用關鍵字生成一個獨特的數字種子，模擬搜尋結果不同
+                baseSeed = simpleHash(userKeywords);
             }
             
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
             
-            // 加入防快取參數
-            const timestamp = new Date().getTime();
-
+            // 每次搜尋，圖片的隨機排列都會不同
             for (let i = 0; i < IMAGE_COUNT; i++) {
-                // 使用者輸入的 Unsplash 連結
-                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${userKeywords}&t=${timestamp}&i=${i}`;
-                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${userKeywords}&t=${timestamp}&i=${i}`;
+                // Picsum 連結格式: https://picsum.photos/seed/[SEED]/[WIDTH]/[HEIGHT]
+                // SEED = 基礎種子 (來自關鍵字) + 迴圈數 (確保不重複)
+                let seed = baseSeed + i;
+                
+                let thumbUrl = `${PICSUM_BASE_URL}seed/${seed}/${RESOLUTION}`;
+                let largeUrl = `${PICSUM_BASE_URL}seed/${seed}/${LARGE_RESOLUTION}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
                 img.src = thumbUrl; 
-                img.alt = `風格關鍵字: ${userKeywords}`;
+                img.alt = `圖片種子: ${seed} (關鍵字: ${userKeywords})`;
 
-                // ⭐ 圖片載入錯誤處理：如果 Unsplash 失敗，切換到 Picsum 後備
-                img.onerror = function() {
-                    console.error(`Unsplash圖片載入失敗，切換到 Picsum 後備。`);
-                    // 如果 Unsplash 失敗，我們改用 Picsum，並使用 i 作為 seed 確保圖片不同
-                    const picsumThumb = `https://picsum.photos/seed/${i}/800/900`;
-                    const picsumLarge = `https://picsum.photos/seed/${i}/1600/1800`;
-                    
-                    img.src = picsumThumb; 
-                    img.alt = '圖片載入失敗 (切換至 Picsum)';
-                    
-                    // 確保點擊後備圖時，放大也是後備圖
-                    item.onclick = function() {
-                        openModal(picsumLarge);
-                    };
-                };
-
-                // 綁定點擊事件 (預設是 Unsplash 大圖)
+                // 圖片載入這次不應有問題，如果真有，可能是網路完全斷線
+                
+                // 綁定點擊事件 
                 item.onclick = function() {
                     openModal(largeUrl);
                 };
@@ -180,7 +177,8 @@
                 gallery.appendChild(item);
             }
             
-            console.log(`正在嘗試使用 Unsplash 搜尋關鍵字: ${userKeywords}`);
+            console.log(`模擬搜尋完成。關鍵字 "${userKeywords}" 轉換為種子 ${baseSeed}。`);
+            console.log("因為安全阻擋，圖片主題無法改變，但圖片排列會根據你的輸入而變化。");
         }
         
         // 頁面載入時，載入預設圖片
