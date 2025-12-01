@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (最終模擬搜尋版)</title>
+    <title>👗 動態時尚圖片畫廊 (女性服飾鎖定版)</title>
     <style>
         /* CSS 樣式與之前版本相同 */
         body { 
@@ -76,16 +76,16 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (最終模擬搜尋版)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (女性服飾鎖定版)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
             <label for="style-input">輸入風格關鍵字:</label>
-            <input type="text" id="style-input" placeholder="例如: red, vintage, suit">
+            <input type="text" id="style-input" placeholder="例如: dress, skirt, vintage">
         </div>
         
         <div class="filter-group">
-            <button id="search-button" onclick="updateGallery()">搜尋圖片</button>
+            <button id="search-button" onclick="updateGallery()">切換圖片組</button>
         </div>
     </div>
 
@@ -100,11 +100,47 @@
     <script>
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
-        // 使用 Picsum 服務 (穩定，但只有風景圖)
-        const PICSUM_BASE_URL = 'https://picsum.photos/';
-        const RESOLUTION = '800/900'; 
-        const LARGE_RESOLUTION = '1600/1800'; 
         
+        // ⭐ 核心變動：定義多組靜態圖片 URL 陣列 (全部為女性時尚主題)
+        
+        // 1. 預設/裙裝 (Dress/Skirt) 圖片組
+        const FASHION_IMAGES_SET_A = [
+            'https://images.pexels.com/photos/1036620/pexels-photo-1036620.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1571470/pexels-photo-1571470.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', // 女性正裝
+            'https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1484807/pexels-photo-1484807.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/2036622/pexels-photo-2036622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3310695/pexels-photo-3310695.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3757753/pexels-photo-3757753.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1083842/pexels-photo-1083842.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3769185/pexels-photo-3769185.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1586762/pexels-photo-1586762.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/45988/pexels-photo-45988.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/994234/pexels-photo-994234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+        ];
+        
+        // 2. 替代/外套 (Jacket/Coat) 圖片組
+        const FASHION_IMAGES_SET_B = [
+            'https://images.pexels.com/photos/2085732/pexels-photo-2085732.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', // 外套/夾克
+            'https://images.pexels.com/photos/4522856/pexels-photo-4522856.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', // 大衣
+            'https://images.pexels.com/photos/279803/pexels-photo-279803.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/3769747/pexels-photo-3769747.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/459793/pexels-photo-459793.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/2101503/pexels-photo-2101503.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/1036620/pexels-photo-1036620.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1484807/pexels-photo-1484807.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/994234/pexels-photo-994234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3310695/pexels-photo-3310695.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3757753/pexels-photo-3757753.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/2036622/pexels-photo-2036622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+        ];
+
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
@@ -119,12 +155,11 @@
         }
 
         /**
-         * 簡易哈希函數，將字串轉為數字，用於隨機種子
-         * @param {string} str - 輸入的文字
-         * @returns {number} - 數字種子
+         * 簡易哈希函數，將字串轉為數字，用於模擬搜尋結果的不同
          */
         function simpleHash(str) {
             let hash = 0;
+            if (str.length === 0) return 0;
             for (let i = 0; i < str.length; i++) {
                 hash = str.charCodeAt(i) + ((hash << 5) - hash);
                 hash = hash & hash; // 轉為 32 位整數
@@ -132,53 +167,49 @@
             return Math.abs(hash);
         }
 
-
         // --- 畫廊更新函數 (核心) ---
         function updateGallery() {
             // ⭐ 獲取使用者輸入的風格關鍵字
-            let userKeywords = document.getElementById('style-input').value.trim();
+            let userKeywords = document.getElementById('style-input').value.toLowerCase().trim();
             
-            // 預設種子 (如果輸入為空)
-            let baseSeed = 100;
+            // 決定要使用哪一組圖片：根據關鍵字哈希值的奇偶性來切換
+            let hashValue = simpleHash(userKeywords);
             
-            // ⭐ 核心模擬邏輯：將關鍵字轉為一個數字種子
-            if (userKeywords !== "") {
-                // 使用關鍵字生成一個獨特的數字種子，模擬搜尋結果不同
-                baseSeed = simpleHash(userKeywords);
+            // ⭐ 核心模擬邏輯：根據哈希值的奇偶性切換圖片組
+            let imagesToUse = FASHION_IMAGES_SET_A; // 預設使用 A 組
+            let groupName = "Dress/Skirt";
+
+            if (hashValue % 2 === 1) { // 如果哈希值是奇數
+                imagesToUse = FASHION_IMAGES_SET_B;
+                groupName = "Jacket/Coat";
             }
-            
+            // 注意：如果輸入為空 (hashValue=0)，則使用偶數組 (A)
+
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
-            
-            // 每次搜尋，圖片的隨機排列都會不同
-            for (let i = 0; i < IMAGE_COUNT; i++) {
-                // Picsum 連結格式: https://picsum.photos/seed/[SEED]/[WIDTH]/[HEIGHT]
-                // SEED = 基礎種子 (來自關鍵字) + 迴圈數 (確保不重複)
-                let seed = baseSeed + i;
-                
-                let thumbUrl = `${PICSUM_BASE_URL}seed/${seed}/${RESOLUTION}`;
-                let largeUrl = `${PICSUM_BASE_URL}seed/${seed}/${LARGE_RESOLUTION}`;
+
+            // 遍歷選定的圖片陣列
+            for (let i = 0; i < imagesToUse.length; i++) {
+                let imageUrl = imagesToUse[i]; 
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
-                img.src = thumbUrl; 
-                img.alt = `圖片種子: ${seed} (關鍵字: ${userKeywords})`;
-
-                // 圖片載入這次不應有問題，如果真有，可能是網路完全斷線
+                img.src = imageUrl; 
+                img.alt = `女性服飾: ${groupName}, 關鍵字: ${userKeywords}`; 
                 
-                // 綁定點擊事件 
+                // 綁定點擊事件 (放大圖使用原圖連結)
                 item.onclick = function() {
-                    openModal(largeUrl);
+                    openModal(imageUrl);
                 };
                 
                 item.appendChild(img);
                 gallery.appendChild(item);
             }
             
-            console.log(`模擬搜尋完成。關鍵字 "${userKeywords}" 轉換為種子 ${baseSeed}。`);
-            console.log("因為安全阻擋，圖片主題無法改變，但圖片排列會根據你的輸入而變化。");
+            console.log(`模擬搜尋完成。圖片組已切換到: ${groupName}。`);
+            console.log(`輸入的關鍵字 (${userKeywords}) 用於決定圖片組別。`);
         }
         
         // 頁面載入時，載入預設圖片
