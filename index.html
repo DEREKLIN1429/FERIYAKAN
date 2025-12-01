@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (含放大功能)</title>
+    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (含篩選與放大)</title>
     <style>
-        /* --- 基礎樣式與畫廊佈局 (與之前相同) --- */
+        /* --- 基礎樣式與畫廊佈局 (響應式設計) --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -19,9 +19,10 @@
             margin-bottom: 20px;
         }
 
+        /* 篩選器容器樣式 */
         .filter-container {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: wrap; 
             justify-content: center;
             gap: 20px;
             padding: 15px;
@@ -51,8 +52,10 @@
             min-width: 150px;
         }
 
+        /* 圖片畫廊主要容器 */
         .gallery-container {
             display: grid;
+            /* 核心響應式網格：自動調整欄位數量，每張圖片最小寬度 280px */
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
@@ -63,7 +66,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             background-color: #fff;
             transition: transform 0.3s ease;
-            cursor: pointer; /* 💡 新增：滑鼠指標變更，提示可點擊 */
+            cursor: pointer; /* 提示可點擊 */
         }
 
         .gallery-item:hover {
@@ -72,8 +75,8 @@
 
         .gallery-item img {
             width: 100%;
-            height: 300px;
-            object-fit: cover;
+            height: 300px; /* 固定高度，讓版面整齊 */
+            object-fit: cover; /* 裁切圖片以填滿容器，保持比例 */
             display: block;
         }
 
@@ -152,6 +155,7 @@
                 <option value="sportswear">運動風 Sportswear</option>
             </select>
         </div>
+
         <div class="filter-group">
             <label for="subject-select">主題/人物 (Subject):</label>
             <select id="subject-select" onchange="updateGallery()">
@@ -161,6 +165,7 @@
                 <option value="clothing">純服飾 Clothing Only</option>
             </select>
         </div>
+
         <div class="filter-group">
             <label for="orientation-select">方向 (Orientation):</label>
             <select id="orientation-select" onchange="updateGallery()">
@@ -189,7 +194,7 @@
         // 圖片解析度：放大顯示時使用的尺寸 (較大)
         const LARGE_RESOLUTION = '1600x1800'; 
 
-        // 💡 取得模態視窗的 DOM 元素
+        // 取得模態視窗的 DOM 元素
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
@@ -216,18 +221,22 @@
          * @description 根據下拉選單的值，動態生成查詢字串並更新圖片畫廊。
          */
         function updateGallery() {
-            // ... (抓取選單值的邏輯與之前相同)
+            // 1. 抓取選單的值
             const style = document.getElementById('style-select').value;
             const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
+
+            // 2. 組合查詢關鍵字
             const keywords = [style, subject].filter(Boolean).join(',');
 
             // 基礎查詢字串
             const baseQuery = `${UNSPLASH_BASE_URL}`;
 
             const gallery = document.getElementById('gallery');
+            // 清空舊的圖片
             gallery.innerHTML = ''; 
 
+            // 3. 動態產生圖片元素
             for (let i = 0; i < IMAGE_COUNT; i++) {
                 // 畫廊小圖的 URL (使用較小 RESOLUTION)
                 let thumbUrl = `${baseQuery}${RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
@@ -241,8 +250,16 @@
                 img.src = thumbUrl; 
                 img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
 
-                // 💡 新增：在圖片上綁定點擊事件
-                // 點擊時，呼叫 openModal，並傳入放大圖片的 URL (largeUrl)
+                // ⭐ 圖片載入錯誤處理：如果 Unsplash 圖片載入失敗，提供替代方案
+                img.onerror = function() {
+                    console.error(`圖片載入失敗: ${thumbUrl}`);
+                    img.style.backgroundColor = '#ccc';
+                    img.alt = '圖片載入失敗 (Image Load Failed)';
+                    // 也可以選擇載入一個本地預設圖片
+                    // img.src = 'placeholder.jpg'; 
+                };
+
+                // 綁定點擊事件，點擊時使用大圖 URL 開啟模態視窗
                 item.onclick = function() {
                     openModal(largeUrl);
                 };
