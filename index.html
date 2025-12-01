@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (最終穩定版 - 含後備)</title>
+    <title>👗 動態時尚圖片畫廊 (GitHub Pages 最終穩定版)</title>
     <style>
-        /* CSS 樣式與之前相同 (省略重複內容) */
+        /* --- CSS 基礎樣式與佈局 --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
         h1 { text-align: center; color: #333; margin-bottom: 20px; }
         .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
@@ -16,7 +16,7 @@
         .gallery-item { overflow: hidden; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: #fff; transition: transform 0.3s ease; cursor: pointer; }
         .gallery-item:hover { transform: translateY(-5px); }
         .gallery-item img { width: 100%; height: 300px; object-fit: cover; display: block; }
-        /* 模態視窗 CSS 保持不變 (省略重複內容) */
+        /* --- 模態視窗 CSS --- */
         .modal { display: none; position: fixed; z-index: 100; padding-top: 60px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); }
         .modal-content { margin: auto; display: block; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); animation-name: zoom; animation-duration: 0.6s; }
         @keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (含後備圖片)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (GitHub Pages 專用)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -68,33 +68,30 @@
     </div>
 
     <script>
-        // 抓取圖片的數量
+        // --- 變數定義 ---
         const IMAGE_COUNT = 15;
+        // Unsplash 專用圖片 API 網域 (用於時尚圖片主題)
         const UNSPLASH_BASE_URL = 'https://source.unsplash.com/';
         const RESOLUTION = '800x900'; 
         const LARGE_RESOLUTION = '1600x1800'; 
         
-        // ⭐ 新增：本地後備圖片路徑
-        // 假設你的 HTML 文件所在資料夾有一個名為 placeholder.jpg 的圖片
+        // ⭐ 本地後備圖片路徑：確保此檔案存在於 GitHub 根目錄
         const FALLBACK_IMAGE_PATH = 'placeholder.jpg'; 
 
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
+        // --- 模態視窗函數 ---
         function openModal(src) {
             modal.style.display = "block";
-            // 💡 如果是後備圖片，放大圖也使用後備圖片
-            if (src === FALLBACK_IMAGE_PATH) {
-                modalImg.src = FALLBACK_IMAGE_PATH;
-            } else {
-                modalImg.src = src;
-            }
+            modalImg.src = src;
         }
 
         function closeModal() {
             modal.style.display = "none";
         }
 
+        // --- 畫廊更新函數 (核心) ---
         function updateGallery() {
             const style = document.getElementById('style-select').value;
             const subject = document.getElementById('subject-select').value;
@@ -115,17 +112,21 @@
                 img.src = thumbUrl; 
                 img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
 
-                // ⭐ 關鍵修正：圖片載入錯誤處理，切換到本地後備圖片
+                // ⭐ 圖片載入錯誤處理：如果 Unsplash 失敗，切換到本地後備
                 img.onerror = function() {
                     console.error(`Unsplash圖片載入失敗，切換到後備圖片: ${thumbUrl}`);
-                    img.src = FALLBACK_IMAGE_PATH;
+                    img.src = FALLBACK_IMAGE_PATH; // 切換到本地圖片
                     img.alt = '圖片載入失敗 (切換至後備)';
+                    
+                    // 為了確保點擊後備圖時，放大也是後備圖，我們更新 item 的點擊事件
+                    item.onclick = function() {
+                        openModal(FALLBACK_IMAGE_PATH);
+                    };
                 };
 
-                // 綁定點擊事件。如果圖片已經是後備圖，largeUrl 也使用後備圖的路徑。
+                // 綁定點擊事件 (預設是 Unsplash 大圖)
                 item.onclick = function() {
-                    const finalLargeUrl = img.src === thumbUrl ? largeUrl : FALLBACK_IMAGE_PATH;
-                    openModal(finalLargeUrl);
+                    openModal(largeUrl);
                 };
                 
                 item.appendChild(img);
