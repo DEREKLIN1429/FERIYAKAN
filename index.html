@@ -3,136 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (使用 Picsum)</title>
+    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (Unsplash 穩定版)</title>
     <style>
-        /* CSS 樣式保持不變 */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap; 
-            justify-content: center;
-            gap: 20px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-group label {
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 5px;
-        }
-
-        .filter-group select {
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            min-width: 150px;
-        }
-
-        .gallery-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .gallery-item {
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* 模態視窗 CSS 保持不變 */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 100;
-            padding-top: 60px; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.9);
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation-name: zoom;
-            animation-duration: 0.6s;
-        }
-
-        @keyframes zoom {
-            from {transform:scale(0)} 
-            to {transform:scale(1)}
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .close:hover, .close:focus {
-            color: #bbb;
-            text-decoration: none;
-        }
-
-        @media only screen and (max-width: 700px) {
-            .modal-content {
-                width: 100%;
-            }
-        }
+        /* CSS 樣式與之前相同 (省略重複內容) */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
+        h1 { text-align: center; color: #333; margin-bottom: 20px; }
+        .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-weight: bold; color: #555; margin-bottom: 5px; }
+        .filter-group select { padding: 10px 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; cursor: pointer; min-width: 150px; }
+        .gallery-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .gallery-item { overflow: hidden; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: #fff; transition: transform 0.3s ease; cursor: pointer; }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item img { width: 100%; height: 300px; object-fit: cover; display: block; }
+        /* 模態視窗 CSS 保持不變 (省略重複內容) */
+        .modal { display: none; position: fixed; z-index: 100; padding-top: 60px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); }
+        .modal-content { margin: auto; display: block; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); animation-name: zoom; animation-duration: 0.6s; }
+        @keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
+        .close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .close:hover, .close:focus { color: #bbb; text-decoration: none; }
+        @media only screen and (max-width: 700px) { .modal-content { width: 100%; } }
     </style>
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (Picsum)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (時尚主題)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -141,24 +36,25 @@
                 <option value="fashion">時尚 Fashion</option>
                 <option value="streetwear" selected>街頭穿搭 Streetwear</option>
                 <option value="vintage">復古風 Vintage</option>
+                <option value="formal">正裝 Formal</option>
+                <option value="sportswear">運動風 Sportswear</option>
             </select>
         </div>
-
         <div class="filter-group">
             <label for="subject-select">主題/人物 (Subject):</label>
             <select id="subject-select" onchange="updateGallery()">
                 <option value="model,female" selected>女生服飾 Female Model</option>
                 <option value="model,male">男生服飾 Male Model</option>
                 <option value="model">不限性別 Model</option>
+                <option value="clothing">純服飾 Clothing Only</option>
             </select>
         </div>
-
         <div class="filter-group">
             <label for="orientation-select">方向 (Orientation):</label>
             <select id="orientation-select" onchange="updateGallery()">
                 <option value="portrait" selected>垂直/人像 Vertical (Portrait)</option>
                 <option value="landscape">水平/風景 Horizontal (Landscape)</option>
-                <option value="square">正方形 Square</option>
+                <option value="">自動 Auto</option>
             </select>
         </div>
     </div>
@@ -174,15 +70,12 @@
     <script>
         // 抓取圖片的數量
         const IMAGE_COUNT = 15;
-        // ⭐ 新增：Picsum 圖片基礎連結 (更穩定)
-        const PICSUM_BASE_URL = 'https://picsum.photos/seed/'; 
-        
-        // 畫廊預設尺寸
-        const DEFAULT_WIDTH = 800;
-        const DEFAULT_HEIGHT = 900; 
-        // 放大圖預設尺寸
-        const LARGE_WIDTH = 1600;
-        const LARGE_HEIGHT = 1800; 
+        // ⭐ 關鍵變更：改回 Unsplash，使用更穩定的 /800x900/? 格式
+        const UNSPLASH_BASE_URL = 'https://unsplash.com/';
+        // 圖片解析度：畫廊顯示時使用的尺寸 (較小)
+        const RESOLUTION = '800x900'; 
+        // 圖片解析度：放大顯示時使用的尺寸 (較大)
+        const LARGE_RESOLUTION = '1600x1800'; 
 
         // 取得模態視窗的 DOM 元素
         const modal = document.getElementById("myModal");
@@ -199,55 +92,40 @@
 
         /**
          * @function updateGallery
-         * @description 根據下拉選單的值，動態調整尺寸並生成 Picsum 圖片。
+         * @description 根據下拉選單的值，動態生成查詢字串並更新圖片畫廊。
          */
         function updateGallery() {
+            const style = document.getElementById('style-select').value;
+            const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
-            
-            let currentWidth, currentHeight, largeWidth, largeHeight;
 
-            // 根據方向選單調整圖片的尺寸比例
-            if (orientation === 'landscape') {
-                currentWidth = DEFAULT_HEIGHT; // 900
-                currentHeight = DEFAULT_WIDTH; // 800
-                largeWidth = LARGE_HEIGHT; // 1800
-                largeHeight = LARGE_WIDTH; // 1600
-            } else if (orientation === 'square') {
-                currentWidth = DEFAULT_WIDTH; // 800
-                currentHeight = DEFAULT_WIDTH; // 800
-                largeWidth = LARGE_WIDTH; // 1600
-                largeHeight = LARGE_WIDTH; // 1600
-            } else { // portrait (垂直/人像)
-                currentWidth = DEFAULT_WIDTH; // 800
-                currentHeight = DEFAULT_HEIGHT; // 900
-                largeWidth = LARGE_WIDTH; // 1600
-                largeHeight = LARGE_HEIGHT; // 1800
-            }
+            // 組合查詢關鍵字
+            // 新增一個 'fashion' 或 'clothing' 作為強關鍵字，確保主題正確
+            const keywords = [style, subject, 'clothing', 'fashion'].filter(Boolean).join(',');
 
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
             for (let i = 0; i < IMAGE_COUNT; i++) {
-                // Picsum 連結格式: https://picsum.photos/seed/[SEED]/[WIDTH]/[HEIGHT]
-                // 使用 i 作為 seed (種子)，確保圖片不同
-                let thumbUrl = `${PICSUM_BASE_URL}${i}/${currentWidth}/${currentHeight}`;
-                let largeUrl = `${PICSUM_BASE_URL}${i}/${largeWidth}/${largeHeight}`;
+                // 連結格式: https://unsplash.com/[RESOLUTION]/?query=[KEYWORDS]&orientation=[ORIENTATION]&sig=[SIG]
+                // 這裡我們使用 query= 來傳遞關鍵字，這比 /random/ 更穩定。
+                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?query=${keywords}&orientation=${orientation}&sig=${i}`;
+                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?query=${keywords}&orientation=${orientation}&sig=${i}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
                 img.src = thumbUrl; 
-                img.alt = `隨機圖片 ${i + 1}`;
+                img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
 
-                // 圖片載入錯誤處理 (保留此邏輯，以防網路問題)
+                // 圖片載入錯誤處理 (保留，以防新的連結再次被阻擋)
                 img.onerror = function() {
                     console.error(`圖片載入失敗: ${thumbUrl}`);
                     img.style.backgroundColor = '#ccc';
                     img.alt = '圖片載入失敗 (Image Load Failed)';
                 };
 
-                // 綁定點擊事件
                 item.onclick = function() {
                     openModal(largeUrl);
                 };
@@ -257,7 +135,6 @@
             }
         }
         
-        // 頁面載入完成後，自動執行一次以載入初始圖片
         window.onload = updateGallery; 
 
     </script>
