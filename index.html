@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (含篩選與放大)</title>
+    <title>👗 動態時尚圖片畫廊 | Fashion Gallery (使用 Picsum)</title>
     <style>
-        /* --- 基礎樣式與畫廊佈局 (響應式設計) --- */
+        /* CSS 樣式保持不變 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -19,7 +19,6 @@
             margin-bottom: 20px;
         }
 
-        /* 篩選器容器樣式 */
         .filter-container {
             display: flex;
             flex-wrap: wrap; 
@@ -52,10 +51,8 @@
             min-width: 150px;
         }
 
-        /* 圖片畫廊主要容器 */
         .gallery-container {
             display: grid;
-            /* 核心響應式網格：自動調整欄位數量，每張圖片最小寬度 280px */
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
@@ -66,7 +63,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             background-color: #fff;
             transition: transform 0.3s ease;
-            cursor: pointer; /* 提示可點擊 */
+            cursor: pointer;
         }
 
         .gallery-item:hover {
@@ -75,28 +72,25 @@
 
         .gallery-item img {
             width: 100%;
-            height: 300px; /* 固定高度，讓版面整齊 */
-            object-fit: cover; /* 裁切圖片以填滿容器，保持比例 */
+            height: 300px;
+            object-fit: cover;
             display: block;
         }
 
-        /* --- 模態視窗 (Modal) 的新增 CSS 樣式 --- */
-
-        /* 模態視窗容器 (預設隱藏) */
+        /* 模態視窗 CSS 保持不變 */
         .modal {
             display: none; 
             position: fixed; 
-            z-index: 100; /* 確保它在所有內容之上 */
+            z-index: 100;
             padding-top: 60px; 
             left: 0;
             top: 0;
             width: 100%; 
             height: 100%; 
             overflow: auto; 
-            background-color: rgba(0,0,0,0.9); /* 半透明黑色背景 */
+            background-color: rgba(0,0,0,0.9);
         }
 
-        /* 模態視窗內容 (放大圖片) */
         .modal-content {
             margin: auto;
             display: block;
@@ -104,7 +98,7 @@
             max-width: 700px;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation-name: zoom; /* 載入動畫 */
+            animation-name: zoom;
             animation-duration: 0.6s;
         }
 
@@ -113,7 +107,6 @@
             to {transform:scale(1)}
         }
 
-        /* 關閉按鈕 */
         .close {
             position: absolute;
             top: 15px;
@@ -125,24 +118,21 @@
             cursor: pointer;
         }
 
-        .close:hover,
-        .close:focus {
+        .close:hover, .close:focus {
             color: #bbb;
             text-decoration: none;
         }
 
-        /* 響應式調整：在小螢幕上調整圖片寬度 */
         @media only screen and (max-width: 700px) {
             .modal-content {
                 width: 100%;
             }
         }
-
     </style>
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊</h1>
+    <h1>✨ 動態時尚圖片畫廊 (Picsum)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -151,8 +141,6 @@
                 <option value="fashion">時尚 Fashion</option>
                 <option value="streetwear" selected>街頭穿搭 Streetwear</option>
                 <option value="vintage">復古風 Vintage</option>
-                <option value="formal">正裝 Formal</option>
-                <option value="sportswear">運動風 Sportswear</option>
             </select>
         </div>
 
@@ -162,7 +150,6 @@
                 <option value="model,female" selected>女生服飾 Female Model</option>
                 <option value="model,male">男生服飾 Male Model</option>
                 <option value="model">不限性別 Model</option>
-                <option value="clothing">純服飾 Clothing Only</option>
             </select>
         </div>
 
@@ -171,7 +158,7 @@
             <select id="orientation-select" onchange="updateGallery()">
                 <option value="portrait" selected>垂直/人像 Vertical (Portrait)</option>
                 <option value="landscape">水平/風景 Horizontal (Landscape)</option>
-                <option value="">自動 Auto</option>
+                <option value="square">正方形 Square</option>
             </select>
         </div>
     </div>
@@ -187,79 +174,80 @@
     <script>
         // 抓取圖片的數量
         const IMAGE_COUNT = 15;
-        // Unsplash 隨機圖片基礎連結
-        const UNSPLASH_BASE_URL = 'https://source.unsplash.com/random/';
-        // 圖片解析度：畫廊顯示時使用的尺寸 (較小)
-        const RESOLUTION = '800x900'; 
-        // 圖片解析度：放大顯示時使用的尺寸 (較大)
-        const LARGE_RESOLUTION = '1600x1800'; 
+        // ⭐ 新增：Picsum 圖片基礎連結 (更穩定)
+        const PICSUM_BASE_URL = 'https://picsum.photos/seed/'; 
+        
+        // 畫廊預設尺寸
+        const DEFAULT_WIDTH = 800;
+        const DEFAULT_HEIGHT = 900; 
+        // 放大圖預設尺寸
+        const LARGE_WIDTH = 1600;
+        const LARGE_HEIGHT = 1800; 
 
         // 取得模態視窗的 DOM 元素
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
-        /**
-         * @function openModal
-         * @description 顯示模態視窗，並載入放大圖片。
-         * @param {string} src - 點擊圖片的來源 URL。
-         */
         function openModal(src) {
             modal.style.display = "block";
             modalImg.src = src;
         }
 
-        /**
-         * @function closeModal
-         * @description 隱藏模態視窗。
-         */
         function closeModal() {
             modal.style.display = "none";
         }
 
         /**
          * @function updateGallery
-         * @description 根據下拉選單的值，動態生成查詢字串並更新圖片畫廊。
+         * @description 根據下拉選單的值，動態調整尺寸並生成 Picsum 圖片。
          */
         function updateGallery() {
-            // 1. 抓取選單的值
-            const style = document.getElementById('style-select').value;
-            const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
+            
+            let currentWidth, currentHeight, largeWidth, largeHeight;
 
-            // 2. 組合查詢關鍵字
-            const keywords = [style, subject].filter(Boolean).join(',');
-
-            // 基礎查詢字串
-            const baseQuery = `${UNSPLASH_BASE_URL}`;
+            // 根據方向選單調整圖片的尺寸比例
+            if (orientation === 'landscape') {
+                currentWidth = DEFAULT_HEIGHT; // 900
+                currentHeight = DEFAULT_WIDTH; // 800
+                largeWidth = LARGE_HEIGHT; // 1800
+                largeHeight = LARGE_WIDTH; // 1600
+            } else if (orientation === 'square') {
+                currentWidth = DEFAULT_WIDTH; // 800
+                currentHeight = DEFAULT_WIDTH; // 800
+                largeWidth = LARGE_WIDTH; // 1600
+                largeHeight = LARGE_WIDTH; // 1600
+            } else { // portrait (垂直/人像)
+                currentWidth = DEFAULT_WIDTH; // 800
+                currentHeight = DEFAULT_HEIGHT; // 900
+                largeWidth = LARGE_WIDTH; // 1600
+                largeHeight = LARGE_HEIGHT; // 1800
+            }
 
             const gallery = document.getElementById('gallery');
-            // 清空舊的圖片
             gallery.innerHTML = ''; 
 
-            // 3. 動態產生圖片元素
             for (let i = 0; i < IMAGE_COUNT; i++) {
-                // 畫廊小圖的 URL (使用較小 RESOLUTION)
-                let thumbUrl = `${baseQuery}${RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
-                // 放大圖的 URL (使用較大 LARGE_RESOLUTION)
-                let largeUrl = `${baseQuery}${LARGE_RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
+                // Picsum 連結格式: https://picsum.photos/seed/[SEED]/[WIDTH]/[HEIGHT]
+                // 使用 i 作為 seed (種子)，確保圖片不同
+                let thumbUrl = `${PICSUM_BASE_URL}${i}/${currentWidth}/${currentHeight}`;
+                let largeUrl = `${PICSUM_BASE_URL}${i}/${largeWidth}/${largeHeight}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
                 img.src = thumbUrl; 
-                img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
+                img.alt = `隨機圖片 ${i + 1}`;
 
-                // ⭐ 圖片載入錯誤處理：如果 Unsplash 圖片載入失敗，提供替代方案
+                // 圖片載入錯誤處理 (保留此邏輯，以防網路問題)
                 img.onerror = function() {
                     console.error(`圖片載入失敗: ${thumbUrl}`);
                     img.style.backgroundColor = '#ccc';
                     img.alt = '圖片載入失敗 (Image Load Failed)';
-                    // 也可以選擇載入一個本地預設圖片
-                    // img.src = 'placeholder.jpg'; 
                 };
 
-                // 綁定點擊事件，點擊時使用大圖 URL 開啟模態視窗
+                // 綁定點擊事件
                 item.onclick = function() {
                     openModal(largeUrl);
                 };
