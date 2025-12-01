@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (最終穩定版)</title>
+    <title>👗 動態時尚圖片畫廊 (最終穩定版 - 防快取)</title>
     <style>
         /* --- CSS 基礎樣式與佈局 --- */
         body { 
@@ -63,7 +63,7 @@
         }
         .gallery-item img { 
             width: 100%; 
-            height: 300px; /* ⭐ 固定高度，減少畫面跳動 (Layout Shift) */
+            height: 300px; /* 固定高度，減少畫面跳動 (Layout Shift) */
             object-fit: cover; 
             display: block; 
         }
@@ -164,7 +164,7 @@
         const RESOLUTION = '800x900'; 
         const LARGE_RESOLUTION = '1600x1800'; 
         
-        // ⭐ 線上後備圖片路徑：使用 Picsum Photos (穩定性高)
+        // 線上後備圖片路徑：使用 Picsum Photos (穩定性高)
         const FALLBACK_IMAGE_THUMB = 'https://picsum.photos/seed/fashion/800/900'; 
         const FALLBACK_IMAGE_LARGE = 'https://picsum.photos/seed/fashion/1600/1800'; 
 
@@ -187,15 +187,18 @@
             const subject = document.getElementById('subject-select').value;
             const orientation = document.getElementById('orientation-select').value;
 
+            // ⭐ 修正：生成一個基於當前時間的隨機數（快取破解）
+            const timestamp = new Date().getTime();
+
             const keywords = [style, subject].filter(Boolean).join(',');
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
             for (let i = 0; i < IMAGE_COUNT; i++) {
                 // 嘗試載入 Unsplash 圖片
-                // 每個連結加入 i 作為 sig (簽名)，確保圖片不同
-                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
-                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${keywords}&orientation=${orientation}&sig=${i}`;
+                // ⭐ 關鍵修正：在連結末尾加入 &t= [時間戳] 和 &i= [迴圈數]
+                let thumbUrl = `${UNSPLASH_BASE_URL}${RESOLUTION}/?${keywords}&orientation=${orientation}&t=${timestamp}&i=${i}`;
+                let largeUrl = `${UNSPLASH_BASE_URL}${LARGE_RESOLUTION}/?${keywords}&orientation=${orientation}&t=${timestamp}&i=${i}`;
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
@@ -204,10 +207,9 @@
                 img.src = thumbUrl; 
                 img.alt = `時尚圖片 ${i + 1} - ${keywords}`;
 
-                // ⭐ 圖片載入錯誤處理：如果 Unsplash 失敗，切換到 Picsum 後備
+                // 圖片載入錯誤處理：如果 Unsplash 失敗，切換到 Picsum 後備
                 img.onerror = function() {
                     console.error(`Unsplash圖片載入失敗，切換到後備圖片。`);
-                    // 使用 Picsum 的 seed/fashion 確保主題相關性 (盡力而為)
                     img.src = FALLBACK_IMAGE_THUMB; 
                     img.alt = '圖片載入失敗 (切換至後備)';
                     
