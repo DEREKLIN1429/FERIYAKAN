@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👗 動態時尚圖片畫廊 (使用 Placehold.it 佔位圖)</title>
+    <title>👗 動態時尚圖片畫廊 (最終穩定版 - 靜態圖片)</title>
     <style>
-        /* CSS 樣式保持不變 */
-        /* ... (CSS 內容與上次提供的相同) ... */
+        /* --- CSS 樣式保持不變 --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
         h1 { text-align: center; color: #333; margin-bottom: 20px; }
         .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
@@ -27,7 +26,7 @@
 </head>
 <body>
 
-    <h1>✨ 動態時尚圖片畫廊 (使用主題佔位圖)</h1>
+    <h1>✨ 動態時尚圖片畫廊 (靜態圖片組)</h1>
 
     <div class="filter-container">
         <div class="filter-group">
@@ -70,12 +69,27 @@
     <script>
         // --- 變數定義 ---
         const IMAGE_COUNT = 15;
-        // ⭐ 使用 Placehold.it 佔位圖服務作為主題來源
-        const PLACEHOLD_BASE_URL = 'https://placeimg.com/';
-        const RESOLUTION = '800/900'; // 寬/高
-        const LARGE_RESOLUTION = '1600/1800'; 
         
-        // 模態視窗元素
+        // ⭐ 核心變動：靜態圖片 URL 陣列 (時尚主題)
+        // 使用大型平台(如 Pexels) 的靜態連結，以確保穩定性。
+        const FASHION_IMAGES = [
+            'https://images.pexels.com/photos/1036620/pexels-photo-1036620.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1484807/pexels-photo-1484807.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/994234/pexels-photo-994234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3310695/pexels-photo-3310695.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3757753/pexels-photo-3757753.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/2036622/pexels-photo-2036622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/157675/fashion-men-s-accessories-road-tie-157675.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/322207/pexels-photo-322207.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1083842/pexels-photo-1083842.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/3769185/pexels-photo-3769185.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/1586762/pexels-photo-1586762.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+            'https://images.pexels.com/photos/45988/pexels-photo-45988.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+        ];
+        
         const modal = document.getElementById("myModal");
         const modalImg = document.getElementById("img01");
 
@@ -91,39 +105,30 @@
 
         // --- 畫廊更新函數 (核心) ---
         function updateGallery() {
+            // 篩選選單的邏輯仍然執行，但僅用於未來或理論上的篩選，不再影響圖片來源
             const style = document.getElementById('style-select').value;
             const subject = document.getElementById('subject-select').value;
-            const orientation = document.getElementById('orientation-select').value;
-
-            // ⭐ 關鍵修正：將所有關鍵字簡化為一個主題，並使用迴圈數進行隨機化
-            // Placeimg.com 支援的主題有：'arch', 'nature', 'people', 'tech', 'any'
-            // 我們將強制使用 'people' 或 'any' 搭配關鍵字
-            const theme = 'people';
-            // 由於 Unsplash 無法使用，我們使用時間戳和迴圈數來控制 Placeimg.com 圖片不重複
-            const timestamp = new Date().getTime();
-
-
+            
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = ''; 
 
-            for (let i = 0; i < IMAGE_COUNT; i++) {
-                // Placeimg 連結格式: https://placeimg.com/[WIDTH]/[HEIGHT]/[THEME]
-                // 為了避免重複，我們將時間戳和迴圈數作為快取破解參數
-                let thumbUrl = `${PLACEHOLD_BASE_URL}${RESOLUTION}/${theme}?t=${timestamp}&i=${i}&q=${style}`;
-                let largeUrl = `${PLACEHOLD_BASE_URL}${LARGE_RESOLUTION}/${theme}?t=${timestamp}&i=${i}&q=${style}`;
+            // 我們只顯示 FASHION_IMAGES 陣列中的圖片
+            for (let i = 0; i < FASHION_IMAGES.length; i++) {
+                // 圖片來源直接來自靜態陣列
+                let imageUrl = FASHION_IMAGES[i]; 
                 
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 
                 const img = document.createElement('img');
-                img.src = thumbUrl; 
-                img.alt = `時尚圖片 ${i + 1} - ${theme}`;
-
-                // 移除 onerror 處理，因為這是新的穩定來源，應該不會失敗
+                img.src = imageUrl; 
+                img.alt = `時尚圖片 ${i + 1} - ${style}, ${subject}`; // alt 文本仍然使用篩選關鍵字
                 
-                // 綁定點擊事件
+                // ⭐ 移除 onerror 處理，因為這是靜態連結，不應該失敗
+
+                // 綁定點擊事件 (放大圖使用原圖連結，因為 Pexels 連結已經是高解析度)
                 item.onclick = function() {
-                    openModal(largeUrl);
+                    openModal(imageUrl);
                 };
                 
                 item.appendChild(img);
